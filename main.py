@@ -1,13 +1,13 @@
-import sqlite3
 from flask import Flask, render_template, request, make_response
-
+import sqlite3
 from datetime import datetime
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import io
 
-app = Flask(__name__)
+from application.models import IncomeExpenses
 
+app = Flask(__name__)
 
 # Retrieve LAST data from database
 def getLastData():
@@ -30,6 +30,7 @@ def getHistData(numSamples):
     dates = []
     temps = []
     hums = []
+
     for row in reversed(data):
         dates.append(row[0])
         temps.append(row[1])
@@ -168,6 +169,11 @@ def grafik():
         'rangeTime': rangeTime
     }
     return render_template('grafik.html', **templateData)
+
+@app.route("/table")
+def table():
+    entries = IncomeExpenses.query.order_by(IncomeExpenses.date.desc()).all()
+    return render_template("table.html", entries=entries)
 
 if __name__ == "__main__":
     app.run(debug=True)

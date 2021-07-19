@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:sqlite:C:\Users\user\PycharmProjects\Final\sensorsData.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="pencemaranUdara" uuid="f62a50ac-f72c-49e3-a24d-42d74d2766a5">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:C:\Users\user\PycharmProjects\Final\pencemaranUdara.db</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
