@@ -1,0 +1,61 @@
+{% include 'header.html' %}
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>STATUS PERANGKAT RASPBERRY</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Monitoring</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <h1 class="col-sm-6">DHT Sensor Data </h1>
+    <div id="g1"></div>
+    <div id="g2"></div>
+    <hr>
+	<h3 align="center"> Last Sensors Reading: {{ time }} ==> <a href="/monitoring"class="button">REFRESH</a></h3>
+	<hr>
+
+
+    <script src="../static/raphael-2.1.4.min.js"></script>
+    <script src="../static/justgage.js"></script>
+    <script>
+		var g1, g2;
+		document.addEventListener("DOMContentLoaded", function(event) {
+			g1 = new JustGage({
+				id: "g1",
+				value: {{temp}},
+				valueFontColor: "black",
+				min: -10,
+				max: 50,
+				title: "Temperature",
+				label: "Celcius"
+			});
+
+			g2 = new JustGage({
+				id: "g2",
+				value: {{hum}},
+				valueFontColor: "black",
+				min: 0,
+				max: 100,
+				title: "Humidity",
+				label: "%"
+			});
+
+		});
+    </script>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+{% include 'footer.html' %}
