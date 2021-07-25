@@ -5,9 +5,7 @@
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-          <div class="col-sm-6">
-            <h1>Tabel Data Science</h1><br>
-          </div>
+            <div class="col-sm-6"></div>
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -18,45 +16,48 @@
       </div><!-- /.container-fluid -->
     </section>
 
-  <div class="col m-1">
-    <table class="table">
-      <thead class="thead-dark">
-        <tr>
-          <th scope="col">Date</th>
-          <th scope="col">PM10</th>
-          <th scope="col">PM25</th>
-          <th scope="col">SO2</th>
-          <th scope="col">CO2</th>
-          <th scope="col">O3</th>
-          <th scope="col">NO2</th>
-          <th scope="col">MAX</th>
-          <th scope="col">Critical</th>
-          <th scope="col">Categori</th>
-          <th scope="col">Lokasi SPKU</th>
-          <th scope="col">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for entry in entries %}
-        <tr>
-          <th scope="row">{{ loop.index }}</th>
-            <td>{{ entry.timestamp}}</td>
-            <td>{{ entry.pm10 }}</td>
-            <td>{{ entry.pm25 }}</td>
-            <td>{{ entry.so2 }}</td>
-            <td>{{ entry.co2 }}</td>
-            <td>{{ entry.o3 }}</td>
-            <td>{{ entry.no2 }}</td>
-            <td>{{ entry.max }}</td>
-            <td>{{ entry.critical }}</td>
-            <td>{{ entry.categori }}</td>
-            <td>{{ entry.lokasi_spku }}</td>
-            <td><a href="{{ url_for('delete', entry_id = entry.timestamp) }}" class="btn btn-outline-danger btn-sm">Delete</a></td>
+    <div align="center">
+        <h2>Tabel Data Science</h2><br>
+    </div>
+
+    <div class="col m-1">
+        <table class="table">
+          <thead class="thead-dark">
+            <tr align="center">
+              <th scope="col">Date</th>
+              <th scope="col">PM10</th>
+              <th scope="col">PM25</th>
+              <th scope="col">SO2</th>
+              <th scope="col">CO2</th>
+              <th scope="col">O3</th>
+              <th scope="col">NO2</th>
+              <th scope="col">MAX</th>
+              <th scope="col">Critical</th>
+              <th scope="col">Categori</th>
+              <th scope="col">Lokasi SPKU</th>
+              <th scope="col">Action</th>
             </tr>
-          {% endfor %}
-        </tbody>
-    </table>
-  </div>
+          </thead>
+          <tbody>
+            {% for row in rows %}
+            <tr align="center">
+                <td>{{ row["date"] }}</td>
+                <td>{{ row["pm10"] }}</td>
+                <td>{{ row["pm25"] }}</td>
+                <td>{{ row["so2"] }}</td>
+                <td>{{ row["co2"] }}</td>
+                <td>{{ row["o3"] }}</td>
+                <td>{{ row["no2"] }}</td>
+                <td>{{ row["max"] }}</td>
+                <td>{{ row["critical"] }}</td>
+                <td>{{ row["categori"] }}</td>
+                <td>{{ row["lokasi_spku"] }}</td>
+                <td align="center"><a href = "{{ url_for('delete', row_id = row.id) }}"><i class="fas fa-trash-alt"/></a></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 {% include 'footer.html' %}

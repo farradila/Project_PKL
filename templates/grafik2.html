@@ -1,0 +1,44 @@
+{% include 'header.html' %}
+
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Load Data Science</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <div align="center">
+      <h2>Load Data Science</h2><br>
+    </div>
+
+    <div class="container">
+          <div class="main">
+              <div class="row">
+                <div class="col-sm-6" style="background-color:#1dcaff" align="center">
+                  <h2 style="color:#fff">Upload Your Dataset</h2>
+                    <p style="color:#fff">We only accept csv format numerical data</p>
+                      <form method=POST enctype=multipart/form-data action="{{ url_for('dataupload') }}" class="form-group">
+                        <div class="form-group">
+                          <input type="file" name="csv_data"><br/>
+                        </div>
+                        <input type="submit"  onclick="myAnalyser()" class="btn btn-primary mb-2">
+                        <input type="reset"  value="Reset" class="btn btn-danger mb-2">
+                      </form>
+                      <br/>
+                </div>
+              </div>
+          </div>
+    </div>
+
+
+</div>
+{% include 'footer.html' %}
