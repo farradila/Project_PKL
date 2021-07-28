@@ -1,96 +1,79 @@
-{%extends "bootstrap/base.html" %}
+{% include 'header.html' %}
 
 {% block content %}
-<!-- Main Content Is Here -->
-
-
-
-<!-- Main jumbotron for a primary marketing message or call to action -->
-      <div class="jumbotron">
-        <div class="container" align="center">
-          <h1 class="display-3"> IoT - Data Science </h1>
-          <p> Simplify Machine Learning and Data Exploration </p>
-          <p><a href="{{ url_for('index')}}" type="button" class="btn btn-danger" > Refresh</a></p>
+<div class="content-wrapper" style="background:#f8f9fa">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6"></div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Hasil Tabel csv</li>
+            </ol>
+          </div>
         </div>
-      </div>
+      </div><!-- /.container-fluid -->
+    </section>
 
+    <div class="container" align="center">
+      <h2> Hasil Load File csv </h2><br><br>
+    </div>
 
-
-  <div class="container">
+    <div class="container">
         <!-- Details Page  -->
         <div class="row">
-          <div class="col-md-5" style="background-color:#3f76ef">
-            <h2>Details of Dataset</h2>
+          <div class="col-md-5" style="background-color:#f8f9fa">
+            <h3>Details of Dataset</h3>
 
             <div class="alert alert-info" role="alert">
-              <p><span style="color:red">Filename</span>: {{ filename }}</p>
+              <p><span style="color:black">Filename</span> : {{ filename }}</p>
             </div>
 
             <div class="alert alert-danger" role="alert">
-              <p><span style="color:red">Time Stamp</span>: {{ date }} </p>
+              <p><span style="color:black">Time Stamp</span> : {{ date }} </p>
             </div>
 
-            <h2>Exploratory Data Analysis</h2>
+            <h3>Exploratory Data Analysis</h3>
 
-            <div class="alert alert-info" role="alert"><p><span style="color:red">Size</span>: {{ df_size }}</p></div>
-            <div class="alert alert-danger" role="alert"><p><span style="color:red">Shape</span>: <br/>
+            <div class="alert alert-info" role="alert"><p><span style="color:black">Size</span> : {{ df_size }}</p></div>
+            <div class="alert alert-danger" role="alert"><p><span style="color:black">Shape</span> : <br/>
             (Row,Columns)<br/>
             {{ df_shape }}</p></div>
 
             <div class="alert alert-info" role="alert">
-              <p><span style="color:red">Columns</span>:
+              <p><span style="color:black">Columns</span> :
                   {% for i in df_columns %}
-
                   <li>{{ i }}</li>
-
                   {% endfor %}
               </p>
             </div>
 
             <div class="alert alert-danger" role="alert">
-              <p><span style="color:red">Target</span>: {{ df_targetname }}</p>
+              <p><span style="color:black">Target</span> : {{ df_targetname }}</p>
             </div>
-                <h2>Model Score</h2>
-
-            {% for mlaccuracy  in model_results %}
-
-            <div class="list-group">
-                <a href="#" class="list-group-item">
-                  <span style="color:red">ML Algorithm | Mean Accuracy | Standard Deviation</span> </a>
-                <a href="#" class="list-group-item">{{ mlaccuracy }}</a>
-           </div>
-
-            {% endfor %}
-
           </div>
 
            <!-- Viewing Dataset As a Table-->
           <div class="col-md-6">
-            <h2>Details of Dataset</h2>
+            <h3>Details table of Dataset</h3>
+            <p><a href="{{ url_for('table')}}" type="button" class="btn btn-warning" > Back </a></p>
             <p>{{ fullfile }} </p>
-            <button onclick="displayDataset()" class="btn btn-primary">View Dataset</button>
+            <button onclick="displayDataset()" class="btn btn-success"> View Dataset </button>
             <br/>
             <br/>
             <div id="myDIV">
               {{ dfplot.to_html(classes="table table-striped table-hover",na_rep="-") | safe}}
             </div>
-
           </div>
-
-
         </div>
+    </div>
 
-      </div>
-
+</div>
+<!-- Main jumbotron for a primary marketing message or call to action -->
 
 {% endblock %}
-
-<!-- Main External 3-Party JS Is Here -->
-
-{% block scripts %}
-
-{{ super() }}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 
 <!-- Function for Displaying Table -->
 <script>
@@ -104,5 +87,4 @@ function displayDataset() {
 }
 </script>
 
-
-{% endblock%}
+{% include 'footer.html' %}
