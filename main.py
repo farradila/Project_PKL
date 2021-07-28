@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, make_response, redirect
+from flask import Flask, render_template, request, make_response, redirect, session, url_for
 import sqlite3
 from datetime import datetime
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
@@ -11,6 +11,8 @@ import numpy as np
 from werkzeug.utils import secure_filename
 from flask_uploads import UploadSet,configure_uploads,IMAGES,DATA,ALL
 
+import models as dbHandler
+
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelEncoder
@@ -18,6 +20,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 
 app = Flask(__name__)
+app.secret_key = 'yoursecretkey'
 
 # Retrieve LAST data from database
 def getLastData():
@@ -91,9 +94,31 @@ freqSamples = freqSample()
 global rangeTime
 rangeTime = 100
 
-@app.route("/")
+@app.route('/', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        dbHandler.insertUser(username, password)
+        users = dbHandler.retrieveUsers()
+        return render_template('index3.html', users=users)
+    else:
+        return render_template('login.html')
+
+@app.route('/index')
 def index():
-    return render_template('index3.html')
+    # Check if user is loggedin
+    if 'loggedin' in session:
+        # User is loggedin show them the home page
+        return render_template('index3.html', username=session['username'])
+    # User is not loggedin redirect to login page
+    return redirect(url_for('login'))
+
+@app.route('/logout')
+def logout():
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    return redirect(url_for('login'))
 
 @app.route("/monitoring")
 def monitoring():
