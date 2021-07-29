@@ -8,8 +8,11 @@ import os
 import time
 import pandas as pd
 import numpy as np
+
 from werkzeug.utils import secure_filename
 from flask_uploads import UploadSet,configure_uploads,IMAGES,DATA,ALL
+import re
+import seaborn as sns
 
 import models as dbHandler
 
@@ -30,8 +33,9 @@ def getLastData():
         time = str(row[0])
         temp = row[1]
         hum = row[2]
+        co2 = row[3]
     # conn.close()
-    return time, temp, hum
+    return time, temp, hum, co2
 
 
 # Get 'x' samples of historical data
@@ -114,6 +118,39 @@ def index():
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    msg = ''
+    # Check if "username", "password" and "email" POST requests exist (user submitted form)
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
+        # Create variables for easy access
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
+        dbHandler.registerUser(username)
+        users = dbHandler.retrieveUsers()
+
+        # If account exists show error and validation checks
+        if users:
+            msg = 'Account already exists!'
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            msg = 'Invalid email address!'
+        elif not re.match(r'[A-Za-z0-9]+', username):
+            msg = 'Username must contain only characters and numbers!'
+        elif not username or not password or not email:
+            msg = 'Please fill out the form!'
+        else:
+            # Account doesnt exists and the form data is valid, now insert new account into accounts table
+            dbHandler.final()
+            msg = 'You have successfully registered!'
+
+    elif request.method == 'POST':
+        # Form is empty... (no POST data)
+        msg = 'Please fill out the form!'
+
+    # Show registration form with message (if any)
+    return render_template('register.html', msg=msg)
+
 @app.route('/logout')
 def logout():
     session.pop('loggedin', None)
@@ -122,11 +159,12 @@ def logout():
 
 @app.route("/monitoring")
 def monitoring():
-    time, temp, hum = getLastData()
+    time, temp, hum, co2 = getLastData()
     templateData = {
         'time': time,
         'temp': temp,
         'hum': hum,
+        'co2': co2,
         'freq': freqSamples,
         'rangeTime': rangeTime
     }
@@ -134,11 +172,12 @@ def monitoring():
 
 @app.route("/grafik")
 def grafik():
-    time, temp, hum = getLastData()
+    time, temp, hum, co2 = getLastData()
     templateData = {
         'time': time,
         'temp': temp,
         'hum': hum,
+        'co2': co2,
         'freq': freqSamples,
         'rangeTime': rangeTime
     }
@@ -193,6 +232,24 @@ def plot_hum():
     fig = Figure()
     axis = fig.add_subplot(1, 1, 1)
     axis.set_title("Humidity [%]")
+    axis.set_xlabel("Samples")
+    axis.grid(True)
+    xs = range(numSamples)
+    axis.plot(xs, ys)
+    canvas = FigureCanvas(fig)
+    output = io.BytesIO()
+    canvas.print_png(output)
+    response = make_response(output.getvalue())
+    response.mimetype = 'image/png'
+    return response
+
+@app.route('/plot/co2')
+def plot_co2():
+    times, temps, hums = getHistData(numSamples)
+    ys = hums
+    fig = Figure()
+    axis = fig.add_subplot(1, 1, 1)
+    axis.set_title("Level")
     axis.set_xlabel("Samples")
     axis.grid(True)
     xs = range(numSamples)
@@ -262,10 +319,22 @@ def result():
         y_pred = clf.predict(x_test)
         result = accuracy_score(y_pred, y_test)
         kategori = "Sedang" if result > 0.5 else "Tidak Sehat"
-        return render_template("prediksi2.html", result=result, kategori=kategori)
+
+        labels = [
+            'categori'
+        ]
+        values = [
+            'critical'
+        ]
+
+        bar_labels = labels
+        bar_values = values
+
+        return render_template("prediksi2.html", result=result, kategori=kategori, labels=bar_labels, values=bar_values)
 
 @app.route("/summary")
 def summary():
+
     return render_template("summary.html")
 
 if __name__ == "__main__":

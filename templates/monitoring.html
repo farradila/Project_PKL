@@ -24,15 +24,16 @@
     <h1 align="center">DHT Sensor Data </h1>
     <div id="g1"></div>
     <div id="g2"></div>
+    <div id="g3"></div>
     <hr>
-	<h3 align="center"> Last Sensors Reading: {{ time }} ==> <a href="/monitoring"class="button">REFRESH</a></h3>
+	<h3 align="center"> Last Sensors Reading: {{ time }} ==> <a class="button" href="/monitoring">REFRESH</a></h3>
 	<hr>
 
 
     <script src="../static/raphael-2.1.4.min.js"></script>
     <script src="../static/justgage.js"></script>
     <script>
-		var g1, g2;
+		var g1, g2, g3;
 		document.addEventListener("DOMContentLoaded", function(event) {
 			g1 = new JustGage({
 				id: "g1",
@@ -52,6 +53,16 @@
 				max: 100,
 				title: "Humidity",
 				label: "%"
+			});
+
+			g3 = new JustGage({
+				id: "g3",
+				value: {{co2}},
+				valueFontColor: "black",
+				min: 0,
+				max: 100,
+				title: "Pencemaran Udara",
+				label: "level"
 			});
 
 		});

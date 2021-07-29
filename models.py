@@ -14,3 +14,18 @@ def retrieveUsers():
 	users = cur.fetchall()
 	con.close()
 	return users
+
+def registerUser(username):
+	con = sql.connect("sensorsData.db")
+	cur = con.cursor()
+	cur.execute("SELECT * FROM users WHERE username = ?", (username,))
+	users = cur.fetchall()
+	con.close()
+	return users
+
+def final(username,password,email):
+	con = sql.connect("sensorsData.db")
+	cur = con.cursor()
+	cur.execute("INSERT INTO users VALUES (NULL, ?, ?, ?)", (username, password, email,))
+	con.commit()
+	con.close()

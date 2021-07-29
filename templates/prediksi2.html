@@ -25,5 +25,29 @@
         <p>Masuk ke dalam kategori : {{ kategori }}</p>
     </div>
 
+    <canvas id="chart" width="600" height="400"></canvas>
+    <script>
+      new Chart(document.getElementById("myCanvas"), {
+          type: 'bar',
+          data: {
+            labels: country,
+            datasets: [
+              {
+                label: "Population (millions)",
+                backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+                data: value
+              }
+            ]
+          },
+          options: {
+            legend: { display: false },
+            title: {
+              display: true,
+              text: 'Text tok'
+            }
+          }
+      });
+    </script>
+
 </div>
 {% include 'footer.html' %}
