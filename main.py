@@ -12,7 +12,6 @@ import numpy as np
 from werkzeug.utils import secure_filename
 from flask_uploads import UploadSet,configure_uploads,IMAGES,DATA,ALL
 import re
-import seaborn as sns
 
 import models as dbHandler
 
@@ -157,6 +156,10 @@ def logout():
     session.pop('id', None)
     return redirect(url_for('login'))
 
+@app.route('/home')
+def home():
+    return render_template('index3.html')
+
 @app.route("/monitoring")
 def monitoring():
     time, temp, hum, co2 = getLastData()
@@ -196,7 +199,7 @@ def my_form_post():
 
     if (numSamples > numMaxSamples):
         numSamples = (numMaxSamples -1)
-    time, temp, hum = getLastData()
+    time, temp, hum, co2 = getLastData()
 
     templateData = {
         'time'		: time,
@@ -320,21 +323,10 @@ def result():
         result = accuracy_score(y_pred, y_test)
         kategori = "Sedang" if result > 0.5 else "Tidak Sehat"
 
-        labels = [
-            'categori'
-        ]
-        values = [
-            'critical'
-        ]
-
-        bar_labels = labels
-        bar_values = values
-
-        return render_template("prediksi2.html", result=result, kategori=kategori, labels=bar_labels, values=bar_values)
+        return render_template("prediksi2.html", result=result, kategori=kategori)
 
 @app.route("/summary")
 def summary():
-
     return render_template("summary.html")
 
 if __name__ == "__main__":
