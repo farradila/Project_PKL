@@ -46,24 +46,40 @@ def getHistData(numSamples):
     dates = []
     temps = []
     hums = []
+    co2 =[]
 
     for row in reversed(data):
         dates.append(row[0])
         temps.append(row[1])
         hums.append(row[2])
-        temps, hums = testeData(temps, hums)
-    return dates, temps, hums
+        co2.append(row[3])
+        temps, hums , co2 = testeData(temps, hums, co2)
+    return dates, temps, hums, co2
 
+def getHistDataSmoke(numSamples):
+    conn = sqlite3.connect('sensorsData.db')
+    curs = conn.cursor()
+    curs.execute("SELECT * FROM smoke_data ORDER BY timestamp DESC LIMIT " + str(numSamples))
+    data = curs.fetchall()
+    dates = []
+    co2 = []
+
+    for row in reversed(data):
+        dates.append(row[1])
+        co2.append(row[2])
+    return dates, co2
 
 # Test data for cleanning possible "out of range" values
-def testeData(temps, hums):
+def testeData(temps, hums, co2):
     n = len(temps)
     for i in range(0, n - 1):
         if (temps[i] < -10 or temps[i] > 50):
             temps[i] = temps[i - 2]
         if (hums[i] < 0 or hums[i] > 100):
             hums[i] = temps[i - 2]
-    return temps, hums
+        if (co2[i] < 0 or co2[i] > 100):
+            co2[i] = temps[i - 2]
+    return temps, hums, co2
 
 
 # Get Max number of rows (table size)
@@ -77,7 +93,7 @@ def maxRowsTable():
 
 # Get sample frequency in minutes
 def freqSample():
-    times, temps, hums = getHistData(2)
+    times, temps, hums, co2 = getHistData(2)
     fmt = '%Y-%m-%d %H:%M:%S'
     tstamp0 = datetime.strptime(times[0], fmt)
     tstamp1 = datetime.strptime(times[1], fmt)
@@ -212,7 +228,7 @@ def my_form_post():
 
 @app.route('/plot/temp')
 def plot_temp():
-    times, temps, hums = getHistData(numSamples)
+    times, temps, hums, co2 = getHistData(numSamples)
     ys = temps
     fig = Figure()
     axis = fig.add_subplot(1, 1, 1)
@@ -230,7 +246,7 @@ def plot_temp():
 
 @app.route('/plot/hum')
 def plot_hum():
-    times, temps, hums = getHistData(numSamples)
+    times, temps, hums, co2 = getHistData(numSamples)
     ys = hums
     fig = Figure()
     axis = fig.add_subplot(1, 1, 1)
@@ -248,14 +264,14 @@ def plot_hum():
 
 @app.route('/plot/co2')
 def plot_co2():
-    times, temps, hums = getHistData(numSamples)
-    ys = hums
+    dates, co2 = getHistDataSmoke(numSamples)
+    ys = co2
     fig = Figure()
     axis = fig.add_subplot(1, 1, 1)
     axis.set_title("Level")
     axis.set_xlabel("Samples")
     axis.grid(True)
-    xs = range(numSamples)
+    xs = range(len(co2))
     axis.plot(xs, ys)
     canvas = FigureCanvas(fig)
     output = io.BytesIO()
@@ -305,6 +321,13 @@ def result():
         file = request.files['csv_data']
         teks = pd.read_csv(file, header=0, delimiter=',', encoding='utf-8')
         df = pd.DataFrame(teks)
+        label = []
+        co = []
+        for i in range(len(df)):
+            label.append(df.values[i][0])
+            co.append(df.values[i][4])
+
+        times, temps, hums, co2 = getHistData(len(label))
 
         xTarget = df.drop(['tanggal', 'critical', 'categori', 'lokasi_spku'], axis=1)
 
@@ -323,11 +346,7 @@ def result():
         result = accuracy_score(y_pred, y_test)
         kategori = "Sedang" if result > 0.5 else "Tidak Sehat"
 
-        return render_template("prediksi2.html", result=result, kategori=kategori)
-
-@app.route("/summary")
-def summary():
-    return render_template("summary.html")
+        return render_template("prediksi2.html", result=result, kategori=kategori, label=label, co=co, co2=co2)
 
 if __name__ == "__main__":
     app.run(debug=True)

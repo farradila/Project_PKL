@@ -38,6 +38,23 @@
                     <p>Prediksi pencemaran udara : {{ result }}</p>
                     <p>Masuk ke dalam kategori : {{ kategori }}</p>
                 </div>
+
+                <div class="ct-chart ct-perfect-fourth"></div>
+
+                <script>
+                  var label = {{label|tojson}}
+                  var co = {{co|tojson}}
+                  var co2 = {{co2|tojson}}
+
+                  var data = {
+                      labels: label,
+                      series: [
+                          co, co2
+                          ]
+                  };
+                  new Chartist.Line('.ct-chart', data);
+                </script>
+
             </div>
         </div>
     </div>
