@@ -13,8 +13,6 @@ from werkzeug.utils import secure_filename
 from flask_uploads import UploadSet,configure_uploads,IMAGES,DATA,ALL
 import re
 
-import models as dbHandler
-
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import LabelEncoder
@@ -115,14 +113,23 @@ rangeTime = 100
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        dbHandler.insertUser(username, password)
-        users = dbHandler.retrieveUsers()
-        return render_template('index3.html', users=users)
-    else:
-        return render_template('login.html')
+    msg = ''
+    if (request.method == "POST"):
+        username = request.form["username"]
+        password = request.form["password"]
+        conn = sqlite3.connect("sensorsData.db")
+        c = conn.cursor()
+        c.execute("SELECT * FROM users WHERE username = '" + username + "' and password = '" + password + "'")
+        r = c.fetchall()
+        for i in r:
+            if (username == i[0] and password == i[1]):
+                session["logedin"] = True
+                session["username"] = username
+                return redirect(url_for("home"))
+            else:
+                msg = 'please enter valid username and password'
+
+    return render_template('login.html', msg=msg)
 
 @app.route('/index')
 def index():
@@ -135,42 +142,26 @@ def index():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    msg = ''
-    # Check if "username", "password" and "email" POST requests exist (user submitted form)
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form:
-        # Create variables for easy access
-        username = request.form['username']
-        password = request.form['password']
-        email = request.form['email']
-        dbHandler.registerUser(username)
-        users = dbHandler.retrieveUsers()
-
-        # If account exists show error and validation checks
-        if users:
-            msg = 'Account already exists!'
-        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
-            msg = 'Invalid email address!'
-        elif not re.match(r'[A-Za-z0-9]+', username):
-            msg = 'Username must contain only characters and numbers!'
-        elif not username or not password or not email:
-            msg = 'Please fill out the form!'
+    msg = None
+    if (request.method == "POST"):
+        if (request.form["username"] != "" and request.form["password"] != ""):
+            username = request.form["username"]
+            password = request.form["password"]
+            conn = sqlite3.connect("sensorsData.db")
+            c = conn.cursor()
+            c.execute("INSERT INTO users VALUES ('" + username + "', '" + password + "')")
+            msg = "Your account is created"
+            conn.commit()
+            conn.close()
         else:
-            # Account doesnt exists and the form data is valid, now insert new account into accounts table
-            dbHandler.final()
-            msg = 'You have successfully registered!'
+            msg = "Something wents wrong"
 
-    elif request.method == 'POST':
-        # Form is empty... (no POST data)
-        msg = 'Please fill out the form!'
-
-    # Show registration form with message (if any)
     return render_template('register.html', msg=msg)
 
 @app.route('/logout')
 def logout():
-    session.pop('loggedin', None)
-    session.pop('id', None)
-    return redirect(url_for('login'))
+    session.clear()
+    return redirect(url_for("login"))
 
 @app.route('/home')
 def home():
